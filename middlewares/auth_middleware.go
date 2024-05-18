@@ -3,6 +3,7 @@ package middlewares
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -12,7 +13,7 @@ func VerifyBearer() gin.HandlerFunc {
 	return func(g *gin.Context) {
 		token := strings.Split(g.GetHeader("Authorization"), " ")[1]
 
-		req, err := http.NewRequest("GET", "http://localhost:8081/auth-service/verify-token", nil)
+		req, err := http.NewRequest("GET", os.Getenv("AUTHENTICATION_SERVER_BASE_URL")+"/verify-token", nil)
 		if err != nil {
 			g.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"error":   err.Error(),
