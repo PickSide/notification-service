@@ -25,10 +25,9 @@ func main() {
 	ns := g.Group("/notification-service")
 
 	ns.GET("/health", rest.GetHealth)
-	ns.GET("/global", rest.GetGlobalNotifications)
 	ns.GET("/user/:userID", rest.GetUserNotifications)
 	ns.POST("/user", rest.CreateUserNotification)
-	ns.POST("/global", rest.CreateGlobalNotification)
+	ns.PUT("/seen/:notificationID", rest.UpdateSeenStatus)
 
 	PrintServiceInformation()
 
