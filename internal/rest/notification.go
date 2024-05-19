@@ -41,3 +41,19 @@ func CreateUserNotification(g *gin.Context) {
 		"success": true,
 	})
 }
+func UpdateSeenStatus(g *gin.Context) {
+	notificationID := g.Param("notificationID")
+
+	err := service.UpdateSeenStatus(notificationID)
+	if err != nil {
+		g.JSON(http.StatusNotFound, gin.H{
+			"error":   err.Error(),
+			"message": "UpdateSeenStatus - Failed to update seen status of notification",
+			"success": false,
+		})
+		return
+	}
+	g.JSON(http.StatusNoContent, gin.H{
+		"success": true,
+	})
+}

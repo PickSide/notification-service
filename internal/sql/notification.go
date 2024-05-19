@@ -75,7 +75,7 @@ func GetUserNotifications(userID string) (*[]models.Notification, error) {
 		return nil, errors.New("GetUserNotifications - Error during conversion (Malformed ID)")
 	}
 
-	rows, err := database.GetClient().Query("SELECT expires, extra, is_read, type FROM notifications WHERE recipient_id = ?", uint64UserID)
+	rows, err := database.GetClient().Query("SELECT id, expires, extra, is_read, type FROM notifications WHERE recipient_id = ?", uint64UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -87,6 +87,7 @@ func GetUserNotifications(userID string) (*[]models.Notification, error) {
 		var notification models.Notification
 
 		err := rows.Scan(
+			&notification.ID,
 			&notification.Expires,
 			&notification.Extra,
 			&notification.IsRead,
@@ -102,4 +103,23 @@ func GetUserNotifications(userID string) (*[]models.Notification, error) {
 	}
 
 	return &notifications, nil
+}
+func UpdateSeenStatus(notificationID string) error {
+	tx, err := database.GetClient().Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			_ = tx.Rollback()
+			return
+		}
+		_ = tx.Commit()
+	}()
+	_, err = tx.Exec(
+		`UPDATE notifications SET is_read = 1 WHERE id = ?`,
+		notificationID,
+	)
+
+	return err
 }
