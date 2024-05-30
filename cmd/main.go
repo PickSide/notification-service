@@ -22,12 +22,15 @@ func main() {
 
 	g.Use(cors.New(buildCors()))
 
-	ns := g.Group("/notification-service")
+	g.GET("/health", rest.GetHealth)
 
-	ns.GET("/health", rest.GetHealth)
-	ns.GET("/user/:userID", rest.GetUserNotifications)
-	ns.POST("/user", rest.CreateUserNotification)
-	ns.PUT("/seen/:notificationID", rest.UpdateSeenStatus)
+	g.GET("/user/:userID", rest.GetUserNotifications)
+	// ns.POST("/user", rest.CreateUserNotification)
+	// ns.PUT("/seen/:notificationID", rest.UpdateSeenStatus)
+
+	g.POST("/dispatch/friend-request", rest.DispatchFriendRequestNotification)
+	g.POST("/dispatch/group-invite", rest.DispatchGroupInviteNotification)
+	g.POST("/dispatch/group-settings-change", rest.DispatchGroupSettingsChangeNotification)
 
 	PrintServiceInformation()
 

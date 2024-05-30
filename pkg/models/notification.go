@@ -5,25 +5,23 @@ import (
 	"time"
 )
 
-type GroupInviteExtra struct {
-	GroupID     string `json:"groupId" validate:"required"`
-	OrganizerID string `json:"organizerId" validate:"required"`
+type GroupInviteNotificationDispatchReq struct {
+	GroupID          string   `json:"groupId" validate:"required"`
+	OrganizerID      string   `json:"organizerId" validate:"required"`
+	TargetRecipients []string `json:"targetRecipients" validate:"required"`
 }
-type GroupSettingsChangedExtra struct {
-	GroupID string `json:"groupId" validate:"required"`
+type GroupSettingsChangeNotificationDispatchReq struct {
+	GroupID          string   `json:"groupId" validate:"required"`
+	OrganizerID      string   `json:"organizerId" validate:"required"`
+	SettingAffected  []string `json:"settingAffected" validate:"required"`
+	TargetRecipients []string `json:"targetRecipients" validate:"required"`
 }
-type FriendRequestExtra struct {
-	UserID string `json:"userId" validate:"required"`
+type FriendRequestNotificationDispatchReq struct {
+	GroupID          string   `json:"groupId" validate:"required"`
+	OrganizerID      string   `json:"organizerId" validate:"required"`
+	TargetRecipients []string `json:"targetRecipients" validate:"required"`
 }
-type EventInviteExtra struct {
-	ActivityID  string `json:"activityId" validate:"required"`
-	OrganizerID string `json:"organizerId" validate:"required"`
-}
-type EventApproachingExtra struct {
-	ActivityID string `json:"activityId" validate:"required"`
-	Date       string `json:"date" validate:"required"`
-}
-type CreateUserNotificationStruct struct {
+type CreateNotificationStruct struct {
 	RecipientID string          `json:"recipientId" validate:"required"`
 	Type        string          `json:"type" validate:"required"`
 	Extra       json.RawMessage `json:"extra,omitempty"`
