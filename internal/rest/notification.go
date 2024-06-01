@@ -3,6 +3,7 @@ package rest
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"notification-service/internal/service"
 	"notification-service/pkg/models"
@@ -27,13 +28,13 @@ func DispatchGroupInviteNotification(g *gin.Context) {
 	var req models.GroupInviteNotificationDispatchReq
 
 	if err := g.ShouldBindJSON(&req); err != nil {
-		g.JSON(http.StatusBadRequest, gin.H{
+		g.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"message": "Bad request",
 			"success": false,
 		})
 		return
 	}
-
+	log.Println("TargetRecipients", req.TargetRecipients)
 	for _, targetID := range req.TargetRecipients {
 		extraData, err := json.Marshal(map[string]string{
 			"groupId":     req.GroupID,
@@ -71,7 +72,7 @@ func DispatchGroupSettingsChangeNotification(g *gin.Context) {
 	var req models.GroupSettingsChangeNotificationDispatchReq
 
 	if err := g.ShouldBindJSON(&req); err != nil {
-		g.JSON(http.StatusBadRequest, gin.H{
+		g.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"message": "Bad request",
 			"success": false,
 		})
@@ -80,10 +81,17 @@ func DispatchGroupSettingsChangeNotification(g *gin.Context) {
 
 }
 
-func GetUserNotifications(g *gin.Context) {
-	userID := g.Param("userID")
+func GetNotifications(g *gin.Context) {
+	userKey := g.Query("userKey")
 
-	result, err := service.GetUserNotifications(userID)
+	if userKey == "" {
+		g.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message": "Bad request",
+			"success": false,
+		})
+	}
+
+	result, err := service.GetUserNotifications(userKey)
 	if err != nil {
 		g.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -94,40 +102,3 @@ func GetUserNotifications(g *gin.Context) {
 		"success": true,
 	})
 }
-
-// func CreateUserNotification(g *gin.Context) {
-// 	var req models.CreateUserNotificationStruct
-
-// 	if err := g.ShouldBindJSON(&req); err != nil {
-// 		g.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-// 		return
-// 	}
-
-// 	_, err := service.CreateUserNotification(req)
-// 	if err != nil {
-// 		g.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-// 		return
-// 	}
-
-//		g.JSON(http.StatusOK, gin.H{
-//			"message": "Notification successfully created",
-//			"success": true,
-//		})
-//	}
-
-// func UpdateSeenStatus(g *gin.Context) {
-// 	notificationID := g.Param("notificationID")
-
-// 	err := service.UpdateSeenStatus(notificationID)
-// 	if err != nil {
-// 		g.JSON(http.StatusNotFound, gin.H{
-// 			"error":   err.Error(),
-// 			"message": "UpdateSeenStatus - Failed to update seen status of notification",
-// 			"success": false,
-// 		})
-// 		return
-// 	}
-// 	g.JSON(http.StatusNoContent, gin.H{
-// 		"success": true,
-// 	})
-// }
