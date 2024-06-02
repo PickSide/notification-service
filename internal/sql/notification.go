@@ -36,15 +36,15 @@ func CreateNotification(req models.CreateNotificationStruct) error {
 
 	return err
 }
-func GetUserNotifications(userID string) (*[]models.Notification, error) {
+func GetUserNotifications(userID string) ([]models.Notification, error) {
 	uint64UserID, err := utils.StringToUint64(userID)
 	if err != nil {
-		return nil, errors.New("GetUserNotifications - Error during conversion (Malformed ID)")
+		return []models.Notification{}, errors.New("GetUserNotifications - Error during conversion (Malformed ID)")
 	}
 
 	rows, err := database.GetClient().Query("SELECT id, expires, extra, is_read, type FROM notifications WHERE recipient_id = ?", uint64UserID)
 	if err != nil {
-		return nil, err
+		return []models.Notification{}, err
 	}
 	defer rows.Close()
 
@@ -61,7 +61,7 @@ func GetUserNotifications(userID string) (*[]models.Notification, error) {
 			&notification.Type,
 		)
 		if err != nil {
-			return nil, err
+			return []models.Notification{}, err
 		}
 
 		notification.IDString = utils.Uint64ToString(notification.ID)
@@ -69,7 +69,7 @@ func GetUserNotifications(userID string) (*[]models.Notification, error) {
 		notifications = append(notifications, notification)
 	}
 
-	return &notifications, nil
+	return notifications, nil
 }
 func UpdateSeenStatus(notificationID string) error {
 	tx, err := database.GetClient().Begin()

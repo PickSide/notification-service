@@ -3,7 +3,6 @@ package rest
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"notification-service/internal/service"
 	"notification-service/pkg/models"
@@ -12,8 +11,7 @@ import (
 )
 
 func DispatchFriendRequestNotification(g *gin.Context) {
-	var req models.FriendRequestNotificationDispatchReq
-
+	var req models.NotificationDispatchReq
 	if err := g.ShouldBindJSON(&req); err != nil {
 		g.JSON(http.StatusBadRequest, gin.H{
 			"message": "Bad request",
@@ -25,7 +23,7 @@ func DispatchFriendRequestNotification(g *gin.Context) {
 }
 
 func DispatchGroupInviteNotification(g *gin.Context) {
-	var req models.GroupInviteNotificationDispatchReq
+	var req models.NotificationDispatchReq
 
 	if err := g.ShouldBindJSON(&req); err != nil {
 		g.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
@@ -34,24 +32,17 @@ func DispatchGroupInviteNotification(g *gin.Context) {
 		})
 		return
 	}
-	log.Println("TargetRecipients", req.TargetRecipients)
+
 	for _, targetID := range req.TargetRecipients {
-		extraData, err := json.Marshal(map[string]string{
-			"groupId":     req.GroupID,
-			"organizerId": req.OrganizerID,
-		})
+		jsonData, err := json.Marshal(req.Extra)
 		if err != nil {
-			g.JSON(http.StatusInternalServerError, gin.H{
-				"message": "Error marshaling extra data",
-				"success": false,
-			})
-			continue
+			jsonData = []byte{}
 		}
 
 		err = service.CreateNotification(models.CreateNotificationStruct{
 			RecipientID: targetID,
 			Type:        "group-invite",
-			Extra:       json.RawMessage(extraData),
+			Extra:       jsonData,
 		})
 		if err != nil {
 			g.JSON(http.StatusInternalServerError, gin.H{
@@ -69,7 +60,7 @@ func DispatchGroupInviteNotification(g *gin.Context) {
 }
 
 func DispatchGroupSettingsChangeNotification(g *gin.Context) {
-	var req models.GroupSettingsChangeNotificationDispatchReq
+	var req models.NotificationDispatchReq
 
 	if err := g.ShouldBindJSON(&req); err != nil {
 		g.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
@@ -91,14 +82,11 @@ func GetNotifications(g *gin.Context) {
 		})
 	}
 
-	result, err := service.GetUserNotifications(userKey)
+	results, err := service.GetUserNotifications(userKey)
 	if err != nil {
 		g.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	g.JSON(http.StatusOK, gin.H{
-		"results": result,
-		"success": true,
-	})
+	g.JSON(http.StatusOK, results)
 }

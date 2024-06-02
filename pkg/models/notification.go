@@ -5,21 +5,9 @@ import (
 	"time"
 )
 
-type GroupInviteNotificationDispatchReq struct {
-	GroupID          string   `json:"groupId" validate:"required"`
-	OrganizerID      string   `json:"organizerId" validate:"required"`
-	TargetRecipients []string `json:"targetRecipients" validate:"required"`
-}
-type GroupSettingsChangeNotificationDispatchReq struct {
-	GroupID          string   `json:"groupId" validate:"required"`
-	OrganizerID      string   `json:"organizerId" validate:"required"`
-	SettingAffected  []string `json:"settingAffected" validate:"required"`
-	TargetRecipients []string `json:"targetRecipients" validate:"required"`
-}
-type FriendRequestNotificationDispatchReq struct {
-	GroupID          string   `json:"groupId" validate:"required"`
-	OrganizerID      string   `json:"organizerId" validate:"required"`
-	TargetRecipients []string `json:"targetRecipients" validate:"required"`
+type NotificationDispatchReq struct {
+	TargetRecipients []string               `json:"targetRecipients" validate:"required"`
+	Extra            map[string]interface{} `json:"extra"`
 }
 type CreateNotificationStruct struct {
 	RecipientID string          `json:"recipientId" validate:"required"`
