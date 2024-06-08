@@ -25,6 +25,7 @@ func main() {
 	g.GET("/health", rest.GetHealth)
 
 	g.GET("/notifications", rest.GetNotifications)
+	g.DELETE("/notifications/:notificationID", rest.DeleteNotification)
 
 	g.POST("/dispatch/friend-request", rest.DispatchFriendRequestNotification)
 	g.POST("/dispatch/group-invite", rest.DispatchGroupInviteNotification)

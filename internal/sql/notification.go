@@ -36,6 +36,18 @@ func CreateNotification(req models.CreateNotificationStruct) error {
 
 	return err
 }
+func DeleteNotification(notificationID string) error {
+	uint64NotificationID, err := utils.StringToUint64(notificationID)
+	if err != nil {
+		return err
+	}
+
+	if _, err := database.GetClient().Exec("DELETE FROM notifications WHERE id = ?", uint64NotificationID); err != nil {
+		return err
+	}
+
+	return nil
+}
 func GetUserNotifications(userID string) ([]models.Notification, error) {
 	uint64UserID, err := utils.StringToUint64(userID)
 	if err != nil {

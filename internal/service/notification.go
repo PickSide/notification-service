@@ -8,6 +8,9 @@ import (
 func CreateNotification(req models.CreateNotificationStruct) error {
 	return sqlutils.CreateNotification(req)
 }
+func DeleteNotification(notificationID string) error {
+	return sqlutils.DeleteNotification(notificationID)
+}
 func GetUserNotifications(userID string) ([]models.Notification, error) {
 	return sqlutils.GetUserNotifications(userID)
 }
