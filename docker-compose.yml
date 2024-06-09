@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  external-service:
+    image: thenoobgrammer/pickside-service:notification-service-latest
+    container_name: notifservice
+    ports:
+      - "8084:8084"
+    networks:
+      - app-network
+    environment:
+      - VAULT_ADDRESS=https://vault.morpheglus.org
+      - VAULT_TOKEN=${VAULT_TOKEN}
