@@ -13,6 +13,11 @@ var (
 )
 
 func CreateNotification(req models.CreateNotificationStruct) error {
+	uint64RecipientID, err := utils.StringToUint64(req.RecipientID)
+	if err != nil {
+		return errors.New("CreateNotification - Error during conversion (Malformed ID)")
+	}
+
 	tx, err := database.GetClient().Begin()
 	if err != nil {
 		return err
@@ -24,11 +29,6 @@ func CreateNotification(req models.CreateNotificationStruct) error {
 		}
 		_ = tx.Commit()
 	}()
-
-	uint64RecipientID, err := utils.StringToUint64(req.RecipientID)
-	if err != nil {
-		return errors.New("CreateNotification - Error during conversion (Malformed ID)")
-	}
 
 	_, err = tx.Exec(`INSERT INTO notifications (expires, extra, recipient_id, type) VALUES (?, ?, ?, ?)`,
 		time.Now().AddDate(0, 0, DAYS_TO_EXPIRE), req.Extra, uint64RecipientID, req.Type,
