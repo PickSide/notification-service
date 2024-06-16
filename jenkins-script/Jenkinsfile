@@ -2,14 +2,14 @@ pipeline {
     agent any
 
     environment {
-        SERVICE_NAME='notification-service'
-        CONTAINER_NAME='notifsvc'
+        SERVICE_NAME = 'notification-service'
+        CONTAINER_NAME = 'notifsvc'
         DOCKERHUB_CREDENTIALS = credentials('docker-creds')
         DOCKERHUB_USERNAME = 'thenoobgrammer'
         REPO_BASE = 'pickside-service'
         TAG = 'latest'
         VAULT_ADDRESS = credentials('vault-address')
-        VAULT_TOKEN = credentials('vault-token') 
+        VAULT_TOKEN = credentials('vault-token')
         SERVER_HOST = 'ubuntu@ec2-34-225-177-141.compute-1.amazonaws.com'
         PLATFORM = 'linux/amd64'
     }
@@ -58,7 +58,7 @@ pipeline {
                                 docker pull thenoobgrammer/pickside-service:${SERVICE_NAME}-latest;
 
                                 echo 'Removing old container...';
-                                if [ "$(docker ps -a -q -f name=${CONTAINER_NAME}" ]; then
+                                if [ \$(docker ps -a -q -f name=${CONTAINER_NAME}) ]; then
                                     echo "Removing existing container: ${CONTAINER_NAME}"
                                     docker rm -f ${CONTAINER_NAME};
                                 else
