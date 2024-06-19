@@ -5,7 +5,7 @@ networks:
 services:
   notifsvc:
     image: thenoobgrammer/pickside-service:notification-service-latest
-    container_name: notifservice
+    container_name: notifsvc
     ports:
       - "8084:8084"
     networks:
