@@ -16,11 +16,6 @@ WORKDIR /app
 
 COPY --from=builder /bin/notification-service /app/
 
-ARG VERSION
-
-ENV SERVICE_NAME="notification-service" \
-    SERVICE_VERSION=${VERSION}
-
 EXPOSE 8084
 
 CMD [ "/app/notification-service" ]
