@@ -2,10 +2,10 @@ package main
 
 import (
 	"log"
+	"notification-service/internal/api"
 	"notification-service/internal/database"
-	"notification-service/internal/rest"
 	"notification-service/internal/vault"
-	"os"
+	"notification-service/pkg/env"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -13,23 +13,27 @@ import (
 )
 
 func main() {
-	dsn := vault.Envars["DSN"].(string)
-	database.Initialize(dsn)
+	// Env intialization
+	env.InitalizeEnvs()
+
+	// Vault initialization
+	vault.InitializeVault()
+
+	// Database initialization
+	database.InitializeDB(vault.Envars["DSN"].(string))
 	defer database.Close()
 
-	gin.SetMode(os.Getenv("GIN_MODE"))
+	gin.SetMode(env.GIN_MODE)
 	g := gin.Default()
 
 	g.Use(cors.New(buildCors()))
 
-	g.GET("/health", rest.GetHealth)
+	g.GET("/health", api.GetHealth)
 
-	g.GET("/notifications", rest.GetNotifications)
-	g.DELETE("/notifications/:notificationID", rest.DeleteNotification)
-
-	g.POST("/dispatch/friend-request", rest.DispatchFriendRequestNotification)
-	g.POST("/dispatch/group-invite", rest.DispatchGroupInviteNotification)
-	g.POST("/dispatch/group-settings-change", rest.DispatchGroupSettingsChangeNotification)
+	g.GET("/notifications", api.GetNotifications)
+	g.POST("/notifications/dispatch", api.DispatchNotification)
+	g.PUT("/notifications/seen", api.DispatchNotification)
+	g.DELETE("/notifications/:notificationID", api.DeleteNotification)
 
 	PrintServiceInformation()
 
@@ -39,9 +43,9 @@ func main() {
 }
 
 func PrintServiceInformation() {
-	log.Printf("Mode %s", os.Getenv("GIN_MODE"))
-	log.Printf("Service name: %s", os.Getenv("SERVICE_NAME"))
-	log.Printf("Version: %s", os.Getenv("SERVICE_VERSION"))
+	log.Printf("Mode %s", env.GIN_MODE)
+	log.Printf("Service name: %s", env.SERVICE_NAME)
+	log.Printf("Version: %s", env.VERSION)
 }
 
 func buildCors() cors.Config {

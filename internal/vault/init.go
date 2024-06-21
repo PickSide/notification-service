@@ -2,7 +2,7 @@ package vault
 
 import (
 	"log"
-	"os"
+	"notification-service/pkg/env"
 
 	vaultclient "github.com/hashicorp/vault/api"
 )
@@ -11,15 +11,15 @@ var (
 	Envars map[string]interface{}
 )
 
-func init() {
+func InitializeVault() {
 	client, err := vaultclient.NewClient(&vaultclient.Config{
-		Address: os.Getenv("VAULT_ADDRESS"),
+		Address: env.VAULT_ADDRESS,
 	})
 	if err != nil {
 		log.Fatalf("Error initializing Vault client: %s", err)
 	}
 
-	vaultToken := os.Getenv("VAULT_TOKEN")
+	vaultToken := env.VAULT_TOKEN
 	if vaultToken == "" {
 		log.Fatal("VAULT_TOKEN is not set")
 	}
